@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุป OOP - Inheritance</title>
+
+    <!-- Import Fonts: Kanit (English), Prompt (Thai), JetBrains Mono (Code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,700;1,400&family=Prompt:wght@400;700&family=JetBrains+Mono:wght@400&display=swap"
+        rel="stylesheet">
+
+    <!-- Import Syntax Highlighting Styles -->
+    <link id="hljs-light-theme" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+    <link id="hljs-dark-theme" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
+
+    <style>
+        /* --- CSS Variables for Theming --- */
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --article-bg: #ffffff;
+            --article-shadow: rgba(0, 0, 0, 0.05);
+            --heading-color: #343a40;
+            --border-color: #e9ecef;
+            --blockquote-bg: #f8f9fa;
+            --blockquote-border: #ced4da;
+            --blockquote-text: #495057;
+            --inline-code-bg: #e9ecef;
+            --inline-code-text: #d6336c;
+            --switch-bg: #ccc;
+            --switch-slider: white;
+            --switch-text: #333;
+
+            /* Sakura Petal Colors */
+            --petal-color-1: rgba(255, 182, 193, 0.7);
+            /* LightPink */
+            --petal-color-2: rgba(255, 192, 203, 0.7);
+            /* Pink */
+            --petal-color-3: rgba(240, 128, 128, 0.7);
+            /* LightCoral */
+
+            /* --- Added for Quiz --- */
+            --quiz-input-bg: #ffffff;
+            --quiz-input-border: #ced4da;
+            --quiz-button-bg: #2196F3;
+            --quiz-button-text: #ffffff;
+            --quiz-button-hover-bg: #1976D2;
+            --quiz-feedback-correct: #28a745;
+            --quiz-feedback-incorrect: #dc3545;
+            --quiz-check-dark: #155724;
+            /* Darker green for checkmark */
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --article-bg: #1e1e1e;
+            --article-shadow: rgba(0, 0, 0, 0.2);
+            --heading-color: #ffffff;
+            --border-color: #333;
+            --blockquote-bg: #2a2a2a;
+            --blockquote-border: #444;
+            --blockquote-text: #b0b0b0;
+            --inline-code-bg: #333;
+            --inline-code-text: #ff80ab;
+            --switch-bg: #555;
+            --switch-slider: #f1f1f1;
+            --switch-text: #f1f1f1;
+
+            /* Dark mode petal colors */
+            --petal-color-1: rgba(255, 182, 193, 0.6);
+            --petal-color-2: rgba(255, 192, 203, 0.6);
+            --petal-color-3: rgba(240, 128, 128, 0.6);
+
+            /* --- Added for Quiz (Dark) --- */
+            --quiz-input-bg: #2a2a2a;
+            --quiz-input-border: #444;
+            --quiz-button-bg: #0d6efd;
+            --quiz-button-hover-bg: #0b5ed7;
+            --quiz-feedback-correct: #20c997;
+            --quiz-feedback-incorrect: #ff6b6b;
+            --quiz-check-dark: #126b52;
+            /* Darker teal for checkmark */
+        }
+
+        /* --- End Theming Variables --- */
+
+        /* --- Basic Setup --- */
+        body {
+            font-family: 'Kanit', 'Prompt', sans-serif;
+            line-height: 1.7;
+            font-size: 17px;
+            background-color: var(--bg-color);
+            /* This is the "sky" */
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Sakura Canvas (Background) --- */
+        canvas#sakura-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Main Content Container --- */
+        article {
+            position: relative;
+            z-index: 1;
+            /* Sits on top of the canvas */
+            max-width: 820px;
+            margin: 2rem auto;
+            padding: 2rem 2.5rem;
+            background: var(--article-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--article-shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 0;
+        }
+
+        /* --- Typography --- */
+        h1,
+        h2 {
+            font-family: 'Prompt', 'Kanit', sans-serif;
+            color: var(--heading-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        p {
+            margin: 1.2rem 0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Markdown Elements --- */
+        strong {
+            color: var(--heading-color);
+        }
+
+        em {
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        blockquote {
+            font-style: italic;
+            border-left: 4px solid var(--blockquote-border);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--blockquote-text);
+            background-color: var(--blockquote-bg);
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        /* --- Code Styling --- */
+        :not(pre)>code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--inline-code-bg);
+            color: var(--inline-code-text);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        pre code {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* --- Theme Switcher Styles --- */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            z-index: 100;
+            /* Sits on top of everything */
+            background-color: var(--article-bg);
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px var(--article-shadow);
+        }
+
+        .theme-switch-wrapper span {
+            font-family: 'Kanit', sans-serif;
+            font-size: 14px;
+            color: var(--switch-text);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg);
+            transition: .4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--switch-slider);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        /* --- Footer Styles --- */
+        footer {
+            position: relative;
+            z-index: 1;
+            /* Sits on top of the canvas */
+            text-align: center;
+            padding: 2rem 1rem;
+            margin: 0 auto;
+            max-width: 820px;
+            font-size: 0.9em;
+            color: var(--blockquote-text);
+            border-top: 1px solid var(--border-color);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        footer .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem 1.5rem;
+            margin-top: 1rem;
+        }
+
+        footer .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        footer .contact-item a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer .contact-item a:hover {
+            color: #2196F3;
+            text-decoration: underline;
+        }
+
+        footer .contact-item svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* --- NEW Quiz and Content Lock Styles --- */
+        .quiz-container {
+            background-color: var(--blockquote-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            transition: background-color 0.5s ease, border-color 0.5s ease, padding 0.5s ease;
+            overflow: hidden;
+            /* Keeps content from spilling during transition */
+        }
+
+        /* This class is added by JS when the answer is correct */
+        .quiz-container.passed {
+            background-color: var(--quiz-feedback-correct);
+            border-color: var(--quiz-check-dark);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .quiz-container p {
+            margin-top: 0;
+            color: var(--text-color);
+            transition: color 0.5s ease;
+        }
+
+        .quiz-container.passed p {
+            color: var(--quiz-button-text);
+            /* White text on green bg */
+            margin-bottom: 0;
+            /* Remove bottom margin on the question */
+        }
+
+        /* Hide input and button when passed */
+        .quiz-container.passed .quiz-input,
+        .quiz-container.passed .quiz-button {
+            display: none;
+        }
+
+        .quiz-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--quiz-input-border);
+            background-color: var(--quiz-input-bg);
+            color: var(--text-color);
+            font-family: 'Kanit', 'Prompt', sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+            /* Ensures padding doesn't affect width */
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .quiz-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--quiz-button-bg);
+            color: var(--quiz-button-text);
+            font-family: 'Kanit', 'Prompt', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .quiz-button:hover {
+            background-color: var(--quiz-button-hover-bg);
+        }
+
+        .quiz-feedback {
+            margin-top: 10px;
+            font-weight: 700;
+            min-height: 1.2em;
+            /* Prevents layout shift */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quiz-feedback span {
+            flex-grow: 1;
+            /* Allows text to take available space */
+            transition: color 0.3s;
+        }
+
+        /* Style for incorrect feedback */
+        .quiz-feedback.incorrect span {
+            color: var(--quiz-feedback-incorrect);
+        }
+
+        /* Style for correct feedback (when .passed is added) */
+        .quiz-container.passed .quiz-feedback {
+            color: var(--quiz-button-text);
+            /* White text */
+            margin-top: 0.5rem;
+            min-height: 0;
+        }
+
+        /* The checkmark (drawn with CSS) */
+        .quiz-feedback::after {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            border: solid var(--quiz-check-dark);
+            /* Darker color from variables */
+            border-width: 0 4px 4px 0;
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-left: 15px;
+            /* Space from text */
+            flex-shrink: 0;
+            /* Prevents checkmark from shrinking */
+        }
+
+        /* Show the checkmark when .passed is added */
+        .quiz-container.passed .quiz-feedback::after {
+            opacity: 1;
+        }
+
+        .locked-content {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- --- Background Canvas for Sakura --- -->
+    <canvas id="sakura-canvas"></canvas>
+
+    <!-- --- Theme Switcher HTML --- -->
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="theme-toggle">
+            <input type="checkbox" id="theme-toggle" checked />
+            <span class="slider round"></span>
+        </label>
+        <span id="theme-label">Light Mode</span>
+    </div>
+
+    <!-- --- Article Content --- -->
+    <article>
+        <h1>สรุป OOP แบบง่ายๆ~ (มั้ง~) IC</h1>
+        <p>ใน Part นี้คือ SuperClass, SubClass หรือ ChildClass ในเรื่อง <strong>Inheritance Class</strong> หรือ
+            <strong>Inherit Class</strong>
+        </p>
+        <pre><code class="language-python">class Shape:&lt;--- (0)
+    def __init__(self,):
+        pass
+
+class Circle(Shape): &lt;--- (1)
+    def __init__(self,):
+        pass
+</code></pre>
+        <p><strong>Inheritance Class</strong> หรือแปลง่ายๆคือ Class "is-a" หรือเป็นการบ่งบอกว่า Class นั้นๆคือ
+            <strong>เป็น</strong> Object ของอีก Object อีก เราจะเรียน Class แบบนี้ว่า <code>Inherit Class</code>
+            เช่นในัวอย่างนี้เป็น <code>Shape</code> กับ <code>Circle</code> ซึ่ง <code>Circle</code>
+            <strong>คือสิ่งหนึ่งใน</strong> <code>Shape</code> ใช่มะ~
+        </p>
+        <p>ทีนี้เราจะมาแยกกันว่าใน Inheritance Class` นี้อันไหนเป็น SuperClass และ SubClass </p>
+        <p><strong>(0)</strong> ส่วนนี้เป็น <code>Class Object</code> หรือ <code>BluePrint</code> Shape เฉยๆ</p>
+        <p><strong>(1)</strong> ส่วนนี้จะนับเป็น <strong>ChildClass</strong> หรือ <strong>SubClass</strong>
+            เนื่องจากเราเอา class <code>Circle</code> เข้าไปใน class <code>Shape</code></p>
+        <ul>
+            <li>ดังนั้น class <code>Shape</code> จะถูกนับเป็น <strong>SuperClass</strong> หรือ <strong>ParentClass</strong>
+                ของ <code>Circle</code> และ class <code>Circle</code> จะเป็น <strong>SubClass</strong> หรือ
+                <strong>ChildClass</strong> ของ class <code>Shape</code></li>
+        </ul>
+        <p>จบ~</p>
+        <p>ทีนี้มันจะมี function <code>super()</code> และ <code>ABC</code> หรือ <code>Abstruct-Base Class</code>
+            Library ใน Python</p>
+
+        <h2>SuperClass และ SubClass</h2>
+        <p>เอา <code>super</code> function ก่อน~
+            คำสั่ง <code>super()</code> คือ Function นะ~
+            ณ ที่นี้เราจะเขียนแบบนี้</p>
+        <pre><code class="language-python">from typing import Self, Any
+
+class Shape:
+    def __init__(self: Self, radius: int, /):
+        self.r = radius &lt;--- (2)
+    [...]
+class Circle(Shape):
+    def __init__(self: Self, radius: int, /):
+        super().__init__(radius) &lt;--- (1)
+    [...]
+
+Circle(5) &lt;--- (0)
+</code></pre>
+        <p>ที่นี้เราจะมาแตกสิ่งที่้ราเห็นใน CodeBlock นี้กัน~</p>
+        <p><strong>(0)</strong> ส่วนแรก แค่นำเลข $5$ เข้าไปใน <code>Circle</code> ผ่าน parameter ที่ชื่อว่า
+            <code>radius</code> ของ <code>Circle</code>~
+        </p>
+        <p><strong>(1)</strong> ส่วนนี้จะเป็น <code>super()</code> function ละ~ ค่อยๆดูนะ เราจำได้ใช่มั้นว่า
+            <code>SuperClass</code> ของ <code>Circle</code> คืออะไร?</p>
+
+        <!-- --- Quiz 1 Start --- -->
+        <div class="quiz-container" id="quiz-1-container">
+            <p><strong>คำถาม:</strong> SuperClass ของ <code>Circle</code> คืออะไร?</p>
+            <input type="text" id="quiz-1-input" class="quiz-input" placeholder="คำตอบของคุณ (พิมพ์เล็ก/ใหญ่ก็ได้)">
+            <button id="quiz-1-btn" class="quiz-button">Check</button>
+            <p id="quiz-1-feedback" class="quiz-feedback"><span></span></p>
+        </div>
+        <!-- --- Quiz 1 End --- -->
+
+        <!-- --- Content 1 Start --- -->
+        <div id="content-1" class="locked-content">
+            <ul>
+                <li><strong>SuperClass</strong> ของ <code>Circle</code> เป็น <code>Shape</code> ที่นี้ใน
+                    <code>super()</code> function จะเป็นการเรียกใช้งาน <strong>SuperClass</strong> ผ่าน
+                    <code>super()</code> function และ ร ที่นี้เราเรียกใช้ <code>__init__()</code> method ของ
+                    <code>super()</code></li>
+            </ul>
+            <blockquote>
+                <p>นั้นหมายความว่า จาก Class Circle ที่เราใส่ arguments radius เป็น 5 ผ่าน Circle Class เข้าไป ใน Class
+                    Circle มีการเรียกใช้งาน <code>super()</code> function ของ <code>Circle</code> คือ <code>Shape</code>
+                    แล้วเราเรียกใช้งาน <code>constructor</code> คือ <code>__init__()</code> method แล้วใส่ radius เข้าไป</p>
+                <ul>
+                    <li>แปลว่า <code>self.r</code> ใน class <code>Shape</code> จะเท่ากับ $5$</li>
+                </ul>
+            </blockquote>
+            <p>จบแค่นี้แหละ~ SuperClass และ SubClass~</p>
+
+            <h2>ABC หรือ Abstruct-Base Class</h2>
+            <p>ต่อไปจะเป็น <code>ABC</code> หรือ <code>Abstruct-Base Class</code> อธิบายสั้นๆจะประมาณว่า
+                <strong>Abstruct-Base Class</strong> คือการที่เราบอกว่า Class นั้นๆ~ <strong>จำเป็นต้อง</strong>
+                เรียกใช้งาน Class นั้นจาก Class ลูกของมันเองเท่านั้น หรือ <code>SubClass</code> เท่านั้น~</p>
+            <p>วิธีการสร้างเราจำเป็ยต้องนำ library <code>ABC</code> เข้ามาใช้งาน และต้องใช้ <code>Decorators</code> ด้วยย~
+                ณ ที่นี้จะเป็น</p>
+            <pre><code class="language-python">from abc import ABC, abstractmethod &lt;--- (0)
+from typing import Self, Any, Optional
+
+class Shape(ABC): &lt;--- (1)
+    @abstractmethod &lt;--- (2)
+    def area(self: Self,) -> Optional[float]: &lt;--- (T1)
+        pass &lt;--- (3)
+
+class Circle(Shape):
+    def __init__(self, radius: int,):
+        self.r = radius
+
+    def area(self: Self,) -> float: &lt;--- (4)
+        return 3.14 * self.r ** 2
+
+x = Circle(5)
+print(x.area()) # 78.75
+</code></pre>
+            <p>okay~~ เรามาแยกส่วนการทำงานของ Object กันดีกว่าาา~</p>
+            <p><strong>(0)</strong> ส่วนที่ 0 คือแค่เป็นการนำ library <code>ABC</code> แล้วเรียนใช้เฉพาะ
+                <code>ABC</code> และ <code>abstractmethod</code>.</p>
+            <blockquote>
+                <p>from typing import Self, Any, <code>Optional</code>
+                    อันนี้มันเป็นแค่บ่นบอกว่า สิ่งๆนั้นจะสามารถเป็นได้ทั้ง <code>NoneType</code> หรือ <code>Types</code>
+                    ที่เราให้ใช้~ ณ <strong>(T1)</strong> ก็จะหมายความว่าเป็นได้ทั้ง <code>NoneType</code> หรือ
+                    <code>float</code></p>
+                <ul>
+                    <li><code>Optional</code> เป็น แค่ <code>Strict Typing</code> สำหรับคนที่ใช้
+                        <code>Strict Typing</code> หรือ <code>pyright</code> module แทน <code>pylance</code> module
+                    </li>
+                </ul>
+            </blockquote>
+            <p><strong>(1)</strong> ส่วนนี้จะเป็น การบอกว่า class <code>Shape</code> นี้อยู่ใน <code>ABC</code> หรือ
+                <code>Abstract-Based Class</code> ง่ายๆคือการนับว่า class <code>Shape</code> นี้เป็น
+                <code>Abstract Class</code> นั้นแหละ~</p>
+            <p><strong>(2)</strong> ส่วนนี้จำกันได้มั้ยว่า <code>@</code> บน <code>method</code> จะถูกเรียกว่าอะไร?</p>
+
+            <!-- --- Quiz 2 Start --- -->
+            <div class="quiz-container" id="quiz-2-container">
+                <p><strong>คำถาม:</strong> <code>@</code> บน method เรียกว่าอะไร?</p>
+                <input type="text" id="quiz-2-input" class="quiz-input"
+                    placeholder="คำตอบของคุณ (มี 's' หรือไม่มีก็ได้)">
+                <button id="quiz-2-btn" class="quiz-button">Check</button>
+                <p id="quiz-2-feedback" class="quiz-feedback"><span></span></p>
+            </div>
+            <!-- --- Quiz 2 End --- -->
+        </div>
+        <!-- --- Content 1 End --- -->
+
+        <!-- --- Content 2 Start --- -->
+        <div id="content-2" class="locked-content">
+            <ul>
+                <li>สิ่งตรงนี้จะเป็นการประกาศ <code>Decorators</code> บนตัว method <code>area()</code> ว่าเป็น
+                    <code>Abstract Method</code></li>
+            </ul>
+            <blockquote>
+                <p>ซึ่ง <code>Abstract Method</code> อธิบายสั่นๆคือ method ที่ไม่มีส่วน <code>Body</code>~</p>
+            </blockquote>
+            <p>ดังนั้นส่วนที่ <strong>(3)</strong> ก้จะบอกว่า ไม่มีส่วน Body ใดๆเลย~ คือ <code>pass</code></p>
+            <p><strong>(4)</strong> ส่วนนี้คือ<strong>จำเป็นต้อง</strong>มีถ้าเรายังใช้ class <code>Shape</code> เป็น
+                <strong>SuperClass</strong> หรือ <strong>ParentClass</strong></p>
+            <ul>
+                <li>เนื่องจากใน <strong>SuperClass</strong> มี <code>Abstract Method</code> ที่มีชื่อว่า
+                    <code>area()</code> ดังนั้นใน <strong>SubClass</strong> จำเป็นที่จะต้องมี <code>area()</code>
+                    method เหมือนกัน~</li>
+            </ul>
+            <blockquote>
+                <p>Abstract Method มีไว้กันการเรียกใช้งาน <strong>SuperClass</strong> แบบตรงๆ
+                    เราสามารถเขียนได้ 2 แบบนะ~</p>
+            </blockquote>
+            <p>แบบแรกจะเป็น</p>
+            <pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self: Self,):
+        pass
+[...]
+</code></pre>
+            <p>แบบที่ 2 จะเป็น</p>
+            <pre><code class="language-python">class Shape:
+    def area(self: Self,):
+        raise NotImplementedError()
+[...]
+</code></pre>
+            <blockquote>
+                <p>ก้แล้วแต่ว่าเราจะใช้แบบไหนมันใช้ได้ทั้งคู่~ แค่แบบแรกจะเป็น <code>TypeError</code> แบบ 2 จะเป็น
+                    <code>NotImplementedError</code>~</p>
+            </blockquote>
+        </div>
+        <!-- --- Content 2 End --- -->
+    </article>
+
+
+    <!-- --- Footer Section --- -->
+    <footer>
+        <p>Author: Suphakorn Khamwongsa</p>
+        <div class="contact-info">
+            <span class="contact-item">
+                <!-- Email Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path
+                        d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" />
+                </svg>
+                <a href="mailto:me@notplai.net">me@notplai.net</a>
+            </span>
+            <span class="contact-item">
+                <!-- User Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+                <span>notplai (all apps)</span>
+            </span>
+        </div>
+    </footer>
+
+    <!-- Import and run the syntax highlighter -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+    <!-- --- Theme Switcher JavaScript --- -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeLabel = document.getElementById('theme-label');
+            const body = document.body;
+            const lightTheme = document.getElementById('hljs-light-theme');
+            const darkTheme = document.getElementById('hljs-dark-theme');
+
+            // Set initial theme based on checkbox
+            function setTheme() {
+                if (themeToggle.checked) {
+                    body.classList.remove('dark-mode');
+                    lightTheme.disabled = false;
+                    darkTheme.disabled = true;
+                    themeLabel.textContent = 'Light Mode';
+                } else {
+                    body.classList.add('dark-mode');
+                    lightTheme.disabled = true;
+                    darkTheme.disabled = false;
+                    themeLabel.textContent = 'Dark Mode';
+                }
+            }
+            
+            setTheme(); // Call on load
+
+            themeToggle.addEventListener('change', setTheme);
+        });
+    </script>
+
+    <!-- --- Sakura Animation JavaScript --- -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('sakura-canvas');
+            const ctx = canvas.getContext('2d');
+            let petals = [];
+            const petalCount = 50;
+            const petalColorNames = [
+                '--petal-color-1',
+                '--petal-color-2',
+                '--petal-color-3'
+            ];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Utility to get a random value
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function getCSSColor(varName) {
+                return getComputedStyle(document.body).getPropertyValue(varName);
+            }
+
+            // Create a single petal
+            function createPetal() {
+                return {
+                    x: random(0, canvas.width),
+                    y: random(-canvas.height, 0),
+                    size: random(3, 7),
+                    speed: random(0.5, 1.5),
+                    wind: random(-0.5, 0.5),
+                    color: getCSSColor(petalColorNames[Math.floor(random(0, petalColorNames.length))])
+                };
+            }
+
+            // Initialize petals
+            function initPetals() {
+                petals = [];
+                for (let i = 0; i < petalCount; i++) {
+                    petals.push(createPetal());
+                }
+            }
+
+            function updatePetalColors() {
+                const newColors = [
+                    getCSSColor('--petal-color-1'),
+                    getCSSColor('--petal-color-2'),
+                    getCSSColor('--petal-color-3')
+                ];
+                for (let i = 0; i < petals.length; i++) {
+                    petals[i].color = newColors[Math.floor(random(0, newColors.length))];
+                }
+            }
+
+
+            function updatePetals() {
+                for (let i = 0; i < petals.length; i++) {
+                    const p = petals[i];
+                    p.y += p.speed;
+                    p.x += p.wind;
+
+                    if (p.y > canvas.height + p.size || p.x > canvas.width + p.size || p.x < -p.size) {
+                        petals[i] = createPetal();
+                        petals[i].y = -petals[i].size;
+                    }
+                }
+            }
+
+            function drawPetals() {
+                ctx.fillStyle = getCSSColor('--bg-color');
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw each petal
+                for (let i = 0; i < petals.length; i++) {
+                    const p = petals[i];
+                    ctx.beginPath();
+                    ctx.fillStyle = p.color;
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+
+            // Animation loop
+            function animate() {
+                drawPetals();
+                updatePetals();
+                requestAnimationFrame(animate);
+            }
+
+            document.getElementById('theme-toggle').addEventListener('change', () => {
+                setTimeout(updatePetalColors, 50);
+            });
+
+            initPetals();
+            animate();
+        });
+    </script>
+
+    <!-- --- NEW Quiz Logic JavaScript --- -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Quiz 1 ---
+            const quiz1Btn = document.getElementById('quiz-1-btn');
+            const quiz1Input = document.getElementById('quiz-1-input');
+            const quiz1Feedback = document.getElementById('quiz-1-feedback');
+            const quiz1Container = document.getElementById('quiz-1-container');
+            const content1 = document.getElementById('content-1');
+
+            function checkQuiz1() {
+                const answer = quiz1Input.value.trim().toLowerCase();
+                const feedbackSpan = quiz1Feedback.querySelector('span');
+
+                if (answer === 'shape') {
+                    quiz1Feedback.classList.remove('incorrect');
+                    feedbackSpan.textContent = 'ถูกต้องครับ! 🎉';
+                    quiz1Container.classList.add('passed');
+                    content1.classList.remove('locked-content');
+                } else {
+                    quiz1Feedback.classList.add('incorrect');
+                    feedbackSpan.textContent = 'ยังไม่ถูกน้า ลองอีกทีครับ';
+                }
+            }
+
+            quiz1Btn.addEventListener('click', () => {
+                if (quiz1Container.classList.contains('passed')) return;
+                checkQuiz1();
+            });
+            quiz1Input.addEventListener('keyup', (event) => {
+                if (quiz1Container.classList.contains('passed')) return;
+                if (event.key === 'Enter') {
+                    checkQuiz1();
+                }
+            });
+
+            // --- Quiz 2 ---
+            const quiz2Btn = document.getElementById('quiz-2-btn');
+            const quiz2Input = document.getElementById('quiz-2-input');
+            const quiz2Feedback = document.getElementById('quiz-2-feedback');
+            const quiz2Container = document.getElementById('quiz-2-container');
+            const content2 = document.getElementById('content-2');
+
+            function checkQuiz2() {
+                const answer = quiz2Input.value.trim().toLowerCase();
+                const feedbackSpan = quiz2Feedback.querySelector('span');
+                
+                if (answer === 'decorators' || answer === 'decorator') {
+                    quiz2Feedback.classList.remove('incorrect');
+                    feedbackSpan.textContent = 'ถูกต้องครับ! 🐍';
+                    quiz2Container.classList.add('passed');
+                    content2.classList.remove('locked-content');
+                } else {
+                    quiz2Feedback.classList.add('incorrect');
+                    feedbackSpan.textContent = 'เกือบแล้ว! ลองนึกอีกทีครับ';
+                }
+            }
+
+            quiz2Btn.addEventListener('click', () => {
+                if (quiz2Container.classList.contains('passed')) return;
+                checkQuiz2();
+            });
+            quiz2Input.addEventListener('keyup', (event) => {
+                if (quiz2Container.classList.contains('passed')) return;
+                if (event.key === 'Enter') {
+                    checkQuiz2();
+                }
+            });
+            
+            // Note: Theme change logic for feedback color is now handled 
+            // entirely by CSS variables and classes, so no JS is needed in the
+            // theme-toggle listener for that.
+        });
+    </script>
+
+</body>
+
+</html>
