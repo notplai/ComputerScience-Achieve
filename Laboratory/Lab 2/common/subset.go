@@ -5,57 +5,92 @@ import (
 	"workspacelb2/common/core"
 )
 
-func SetParser(s string) []rune {
+// SetParser extracts top-level elements by comma, respecting nested braces.
+func SetParser(s string) []string {
 	s = strings.TrimSpace(s)
-	s = strings.Trim(s, "{} \r\n")
-	if len(s) == 0 { return []rune{} }
-
-	elem := make([]rune, 0)
-	seen := make(map[rune]bool)
-
-	for _, c := range s {
-		if c == ',' || c == ' ' || c == '\t' || c == '\n' || c == '\r' { continue }
-		if !seen[c] { seen[c] = true; elem = append(elem, c) }
+	// Remove only the outermost pair of braces
+	if strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}") {
+		s = s[1 : len(s)-1]
 	}
-	return elem
-}
+	s = strings.TrimSpace(s)
+	if len(s) == 0 {
+		return []string{}
+	}
 
-func SubSets(set []rune) [][]rune {
-	q := &core.Queue[[]rune]{}
-	q.Push([]rune{})
+	var elements []string
+	var current strings.Builder
+	depth := 0
+	seen := make(map[string]bool)
+
+	for _, r := range s {
+		switch r {
+		case '{':
+			depth++
+			current.WriteRune(r)
+		case '}':
+			depth--
+			current.WriteRune(r)
+		case ',':
+			// Only split on commas at the top level
+			if depth == 0 {
+				elem := strings.TrimSpace(current.String())
+				println(elem)
+				if elem != "" && !seen[elem] {
+					seen[elem] = true
+					elements = append(elements, elem)
+				}
+				current.Reset()
+			} else {
+				current.WriteRune(r)
+			}
+		default:
+			current.WriteRune(r)
+		}
+	}
+
+	if current.Len() > 0 {
+		elem := strings.TrimSpace(current.String())
+		if elem != "" && !seen[elem] {
+			seen[elem] = true
+			elements = append(elements, elem)
+		}
+	}
+
+	return elements
+}
+// ["{1}"]
+func SubSets(set []string) [][]string {
+	q := &core.Queue[[]string]{}
+	q.Enqueue([]string{}) // [{}]
 
 	for _, elem := range set {
 		lSize := q.Size()
 		for range lSize {
-			curr, _ := q.Pop()
+			curr, _ := q.Dequeue()
 
-			excl := make([]rune, len(curr))
+			excl := make([]string, len(curr))
 			copy(excl, curr)
-			q.Push(excl)
+			q.Enqueue(excl)
 
-			incl := make([]rune, len(curr), len(curr)+1)
+			incl := make([]string, len(curr), len(curr)+1)
 			copy(incl, curr)
 			incl = append(incl, elem)
-			q.Push(incl)
+			q.Enqueue(incl)
 		}
 	}
 
-	var r [][]rune
+	var r [][]string
 	for !q.IsEmpty() {
-		subset, _ := q.Pop()
+		subset, _ := q.Dequeue()
 		r = append(r, subset)
 	}
 	return r
 }
 
-func Subsetf(subsets [][]rune) []string {
+func Subsetf(subsets [][]string) []string {
 	formatted := make([]string, len(subsets))
 	for i, sub := range subsets {
-		parts := make([]string, len(sub))
-		for j, r := range sub {
-			parts[j] = string(r)
-		}
-		formatted[i] = "{" + strings.Join(parts, ", ") + "}"
+		formatted[i] = "{" + strings.Join(sub, ", ") + "}"
 	}
 	return formatted
 }

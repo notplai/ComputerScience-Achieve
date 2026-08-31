@@ -6,7 +6,7 @@ type Queue[T any] struct {
 	size int
 }
 
-func (q *Queue[T]) Push(v T) {
+func (q *Queue[T]) Enqueue(v T) {
 	newNode := &Node[T]{ value: v }
 	if q.tail == nil {
 		q.tail = newNode
@@ -18,7 +18,7 @@ func (q *Queue[T]) Push(v T) {
 	q.size++
 }
 
-func (q *Queue[T]) Pop() (T, bool) {
+func (q *Queue[T]) Dequeue() (T, bool) {
 	var zero T
 	if q.head == nil { return zero, false }
 	v := q.head.value
