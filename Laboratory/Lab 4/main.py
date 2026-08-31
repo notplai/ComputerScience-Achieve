@@ -1,3 +1,6 @@
+# Time Complexity O(mp!)
+# Memory Complexity O(n)
+
 import os
 from pathlib import Path
 
@@ -10,10 +13,14 @@ for entry in Path(os.path.join(os.getcwd(), 'example')).glob('*.txt'):
         l, k = content[0].strip().upper(), int(content[1])
         
         # if not re.match(r"^[GP]+$", l): # using regex to check (fuxkin slow)
+            # Regex engine overhead & state transitions.
         # if not all(char in "GP" for char in l): # using for-all (hmmph... same same)
+            # Bytecode loop and generator expression overhead in Python.
         # if not set(l).issubset({'G', 'P'}): # using subset to check (ohh! nice man!)
+            # Allocates a brand new hash set of size N just to compare.
         if not frozenset({'G', 'P'}).issuperset(l): raise TypeError(f"Invalid sequence in {entry.name}: First line must contain 'G' or 'P' only.")
         # using frozenset and superset check instead. (super god tier)
+            # Reuses a static 2-element set and consumes iterable l in pure C without allocating a temporary set.
         
         print(f'{entry.name} as {l, k = }')
         print('Brute Force', *brute_force(l, k), sep='\n├ ')
