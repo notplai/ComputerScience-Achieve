@@ -1,5 +1,5 @@
 # Time Complexity O(n)
-# Memory Complexity O(1)
+# Memory Complexity O(n)
 
 def greedy(l: str, k: int, /) -> int:
     g, p = [_ for _, c in enumerate(l) if c == 'G'], [_ for _, c in enumerate(l) if c == 'P']

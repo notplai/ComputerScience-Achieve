@@ -1,5 +1,5 @@
-# Time Complexity O(n)
-# Memory Complexity ~O(1)
+# Time Complexity O(p!)
+# Memory Complexity ~O(n)
 
 def brute_force(l: str, k: int, /) -> tuple[int, int]:
     g, p = [_ for _, c in enumerate(l) if c == 'G'], [_ for _, c in enumerate(l) if c == 'P']
