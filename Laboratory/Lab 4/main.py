@@ -1,6 +1,3 @@
-# Time Complexity O(mp!)
-# Memory Complexity O(n)
-
 import os
 from pathlib import Path
 
@@ -12,7 +9,7 @@ for entry in Path(os.path.join(os.getcwd(), 'example')).glob('*.txt'):
         if len(content := entry.read_text(encoding='utf-8').splitlines()) < 2: continue
         l, k = content[0].strip().upper(), int(content[1])
         
-        # if not re.match(r"^[GP]+$", l): # using regex to check (fuxkin slow)
+        # if not re.match(r"^[GP]+$", l): # using regex to check (so slow)
             # Regex engine overhead & state transitions.
         # if not all(char in "GP" for char in l): # using for-all (hmmph... same same)
             # Bytecode loop and generator expression overhead in Python.

@@ -1,1 +1,169 @@
-.DS_Store
+## Operating System & IDEs
+# macOS
+**/.DS_Store
+**/.DS_Store?
+**/.AppleDouble
+**/.LSOverride
+**/._*
+
+# Windows
+**/Thumbs.db
+**/Thumbs.db:encrypt
+**/ehthumbs.db
+**/Desktop.ini
+
+# Linux
+**/*~
+**/.fuse_hidden*
+**/.directory
+
+## General Editor Tooling & IDEs
+**/.zed/settings.json
+**/.zed/keymap.json
+**/.zed/tasks.json
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+**/.idea/
+**/*.swp
+**/*.swo
+**/*.iml
+**/*.ipr
+**/*.iws
+
+# Environment & Secrets
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.pem
+**/*.key
+
+## Python (uv, Pip, Pytest, Linters)
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/*.so
+**/.Python
+
+# Virtual environments
+**/.venv/
+**/venv/
+**/ENV/
+**/env/
+
+# Tooling caches, packaging & build artifacts
+**/.uv/
+**/.ruff_cache/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.coverage
+**/.coverage.*
+**/htmlcov/
+**/*.egg-info/
+**/.eggs/
+
+## Java & Kotlin (Gradle & Maven)
+**/*.class
+**/*.jar
+**/*.war
+**/*.nar
+**/*.ear
+**/*.zip
+**/*.tar.gz
+**/*.rar
+
+# Gradle & Maven build files
+**/.gradle/
+**/target/
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# IDE build directories
+**/out/
+**/.navigation/
+**/captures/
+
+## Go
+**/*.exe
+**/*.exe~
+**/*.dll
+**/*.dylib
+**/profile.out
+**/*.test
+
+## Rust (Cargo)
+**/target/
+**/*.rs.bk
+**/*.pdb
+
+## JavaScript / TypeScript / Bun
+**/node_modules/
+**/.bun/install/cache/
+**/.npm/
+**/.eslintcache
+**/.parcel-cache/
+**/.turbo/
+**/.next/
+**/.nuxt/
+**/.output/
+**/bun.lockb
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+##C / C++ (CMake, Make, MSVC, Clangd)
+# Objects & Static Libraries
+**/*.o
+**/*.obj
+**/*.a
+**/*.lib
+
+# Output binaries & artifacts
+**/*.out
+**/*.app
+**/CMakeFiles/
+**/CMakeCache.txt
+**/CMakeScripts/
+**/cmake_install.cmake
+**/Makefile
+**/cmake-build-*/
+**/compile_commands.json
+**/.clangd/
+**/.cache/
+
+## C# / .NET
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
+
+# User files & cache
+**/.vs/
+**/.rider/
+**/*.user
+**/*.userosscache
+**/*.suo
+**/*.sln.docstates
+**/*.DotSettings.user
+**/_ReSharper*/
+
+# NuGet
+**/*.nupkg
+**/*.snupkg
+**/packages/
+**/project.lock.json
+**/project.assets.json
+
+## Shared Build & Distribution Directories
+**/build/
+**/dist/
+**/bin/
