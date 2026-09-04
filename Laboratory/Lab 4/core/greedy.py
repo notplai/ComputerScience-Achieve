@@ -5,7 +5,7 @@ def greedy(l: str, k: int, /) -> int:
 
     # while i < len(g) and j < len(p):
     #     if abs(g[i] - p[j]) <= k: m+=1; i+=1; j+=1
-    #     elif g[i] < p[j]: i+=1
+    #     elif g[i] < p[j]: i+=1 # g
     #     else: j+=1
 
     # No memory allocation, C traversel, single scan per pointer
@@ -34,7 +34,8 @@ def greedy(l: str, k: int, /) -> int:
 
         # simpify more...
         # |g - p| <= k <=> -k <= g - p <= k
-        if -k <= g - p <= k: m, g, p = m + 1, l.find('G', g + 1), l.find('P', p + 1)
+        if -k <= g - p <= k: 
+            m, g, p = m + 1, l.find('G', g + 1), l.find('P', p + 1)
         elif g < p: g = l.find('G', g + 1) # g is too far left to catch p
         else: p = l.find('P', p + 1) # p is too far left to catch g
     

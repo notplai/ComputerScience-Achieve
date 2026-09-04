@@ -4,7 +4,7 @@ from pathlib import Path
 from core import brute_force, greedy
 
 # l, k = input().upper(), int(input())
-for entry in Path(os.path.join(os.getcwd(), 'example')).glob('*.txt'): 
+for entry in Path(os.path.join(os.getcwd(), 'example')).glob('4.5.3.txt'): 
     if entry.is_file():
         if len(content := entry.read_text(encoding='utf-8').splitlines()) < 2: continue
         l, k = content[0].strip().upper(), int(content[1])

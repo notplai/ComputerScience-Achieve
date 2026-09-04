@@ -5,39 +5,38 @@ data class GCDResult(val gcd: Long, val operations: Long)
 
 fun main() {
     val dir = File("src/example")
-    val dataList: List<Pair<Long, Long>> = dir
+    val dataList: List<List<Long>> = dir
         .listFiles { file -> file.isFile }
         ?.flatMap { file ->
             file.readLines()
                 .filter { it.isNotBlank() }
                 .map { line ->
-                    val (first, second) = line.split(",").map { it.trim().toLong() }
-                    first to second
+                    line.split(",")
+                        .map { it.trim().toLong() }
+                        .filter { it > 0L }
                 }
+                .filter { it.isNotEmpty() }
         } ?: emptyList()
 
-    for ((m, n) in dataList) {
-        println("m= $m, n= $n")
-        val r1 = findGCD1(m, n)
-        val r2 = findGCD2(m, n)
-        val r3 = findGCD3(m, n)
+    for (numbers in dataList) {
+        println("Numbers: ${numbers.joinToString(", ")}")
+        val r1 = findGCD1(numbers)
+        val r2 = findGCD2(numbers)
+        val r3 = findGCD3(numbers)
         println("  GCD1 (naive):  gcd=${r1.gcd}, operations=${r1.operations}")
         println("  GCD2 (sieve):  gcd=${r2.gcd}, operations=${r2.operations}")
         println("  GCD3 (Euclid): gcd=${r3.gcd}, operations=${r3.operations}")
     }
 }
 
-/** Exact integer exponentiation for Long. */
+// Exact integer exponentiation for Long.
 fun longPow(base: Long, exp: Int): Long {
     var r = 1L
     repeat(exp) { r *= base }
     return r
 }
 
-/**
- * Trial-division prime factorization.
- * Returns the factor list plus the number of division/step tests performed.
- */
+// Trial-division prime factorization.
 fun primeFactors(n: Long): Pair<List<Long>, Long> {
     var num = n
     val factors = mutableListOf<Long>()
@@ -59,37 +58,61 @@ fun primeFactors(n: Long): Pair<List<Long>, Long> {
 }
 
 /**
- * Calculates GCD from prime factor frequency maps.
+ * Calculates GCD from a list of prime factor frequency maps.
+ * Finds prime factors common to all numbers and uses their minimum exponent.
  */
-fun gcdFromFactors(fn: Map<Long, Int>, fm: Map<Long, Int>): Pair<Long, Long> {
+fun gcdFromFactorMaps(maps: List<Map<Long, Int>>): Pair<Long, Long> {
+    if (maps.isEmpty()) return Pair(1L, 0L)
+    if (maps.size == 1) {
+        val singleGcd = maps[0].entries.fold(1L) { acc, (p, exp) -> acc * longPow(p, exp) }
+        return Pair(singleGcd, 0L)
+    }
+
     var gcd = 1L
     var ops = 0L
+    val baseMap = maps.minByOrNull { it.size } ?: maps[0]
 
-    for ((pm, nm) in fm) {
+    for ((p, count) in baseMap) {
         ops++
-        val nn = fn[pm]
-        if (nn != null) {
-            gcd *= longPow(pm, minOf(nm, nn))
+        var minCount = count
+        var presentInAll = true
+
+        for (map in maps) {
+            if (map === baseMap) continue
+            ops++
+            val c = map[p]
+            if (c == null) {
+                presentInAll = false
+                break
+            }
+            if (c < minCount) {
+                minCount = c
+            }
+        }
+
+        if (presentInAll) {
+            gcd *= longPow(p, minCount)
         }
     }
     return Pair(gcd, ops)
 }
 
-// Naive Solution (Trial Division)
-fun findGCD1(m: Long, n: Long): GCDResult {
-    val (fmList, opsM) = primeFactors(m)
-    val (fnList, opsN) = primeFactors(n)
-    val fm = fmList.groupingBy { it }.eachCount()
-    val fn = fnList.groupingBy { it }.eachCount()
+// Naive Solution (Trial Division for N numbers)
+fun findGCD1(numbers: List<Long>): GCDResult {
+    if (numbers.isEmpty()) return GCDResult(0L, 0L)
 
-    val (gcd, ops) = gcdFromFactors(fn, fm)
-    return GCDResult(gcd, opsM + opsN + ops)
+    var totalFactorOps = 0L
+    val factorMaps = numbers.map { n ->
+        val (factors, ops) = primeFactors(n)
+        totalFactorOps += ops
+        factors.groupingBy { it }.eachCount()
+    }
+
+    val (gcd, combineOps) = gcdFromFactorMaps(factorMaps)
+    return GCDResult(gcd, totalFactorOps + combineOps)
 }
 
-/**
- * Sieve of Eratosthenes up to sqrt(max(m, n)).
- * Limits memory footprint to < 4MB, preventing OutOfMemoryError on large inputs.
- */
+// Sieve of Eratosthenes up to limit.
 fun sievePrimes(limit: Int): Pair<List<Long>, Long> {
     if (limit < 2) return Pair(emptyList(), 0L)
     val isPrime = BooleanArray(limit + 1) { true }
@@ -112,17 +135,12 @@ fun sievePrimes(limit: Int): Pair<List<Long>, Long> {
 
     val primes = mutableListOf<Long>()
     for (i in 2..limit) {
-        if (isPrime[i]) {
-            primes.add(i.toLong())
-        }
+        if (isPrime[i]) primes.add(i.toLong())
     }
     return Pair(primes, ops)
 }
 
-/**
- * Factorization using precomputed primes from the Sieve.
- * Only tests prime divisors, avoiding composite checks.
- */
+// Factorization using precomputed primes from the Sieve.
 fun primeFactorsSieve(n: Long, primes: List<Long>): Pair<List<Long>, Long> {
     val factors = mutableListOf<Long>()
     var num = n
@@ -143,30 +161,33 @@ fun primeFactorsSieve(n: Long, primes: List<Long>): Pair<List<Long>, Long> {
     return Pair(factors, ops)
 }
 
-// Sieve-assisted Factorization GCD
-fun findGCD2(m: Long, n: Long): GCDResult {
-    val limit = sqrt(maxOf(m, n).toDouble()).toInt() + 1
-    val (primes, sieveOps) = sievePrimes(limit)
-    val (fmList, opsM) = primeFactorsSieve(m, primes)
-    val (fnList, opsN) = primeFactorsSieve(n, primes)
-    val fm = fmList.groupingBy { it }.eachCount()
-    val fn = fnList.groupingBy { it }.eachCount()
+// Sieve-assisted Factorization GCD for N numbers
+fun findGCD2(numbers: List<Long>): GCDResult {
+    if (numbers.isEmpty()) return GCDResult(0L, 0L)
 
-    val (gcd, ops) = gcdFromFactors(fn, fm)
-    return GCDResult(gcd, sieveOps + opsM + opsN + ops)
+    val maxVal = numbers.maxOrNull() ?: 0L
+    val limit = sqrt(maxVal.toDouble()).toInt() + 1
+    val (primes, sieveOps) = sievePrimes(limit)
+
+    var totalFactorOps = 0L
+    val factorMaps = numbers.map { n ->
+        val (factors, ops) = primeFactorsSieve(n, primes)
+        totalFactorOps += ops
+        factors.groupingBy { it }.eachCount()
+    }
+
+    val (gcd, combineOps) = gcdFromFactorMaps(factorMaps)
+    return GCDResult(gcd, sieveOps + totalFactorOps + combineOps)
 }
 
-/**
- * Euclidean Algorithm.
- * Returns the GCD plus the number of modulo steps performed.
- */
-fun findGCD3(m: Long, n: Long): GCDResult {
+// Helper: Pairwise Euclidean GCD with operation counting.
+fun euclideanGCD(m: Long, n: Long): Pair<Long, Long> {
     var a = m
     var b = n
     var ops = 0L
     while (a != 0L && b != 0L) {
-        if (a == b) return GCDResult(a, ops)
-        else if (a > b) {
+        if (a == b) return Pair(a, ops)
+        if (a > b) {
             a %= b
             ops++
         } else {
@@ -174,5 +195,23 @@ fun findGCD3(m: Long, n: Long): GCDResult {
             ops++
         }
     }
-    return GCDResult(if (a == 0L) b else a, ops)
+    return Pair(if (a == 0L) b else a, ops)
+}
+
+// Euclidean Algorithm for N numbers
+fun findGCD3(numbers: List<Long>): GCDResult {
+    if (numbers.isEmpty()) return GCDResult(0L, 0L)
+    if (numbers.size == 1) return GCDResult(numbers[0], 0L)
+
+    var currentGcd = numbers[0]
+    var totalOps = 0L
+
+    for (i in 1 until numbers.size) {
+        val (gcd, ops) = euclideanGCD(currentGcd, numbers[i])
+        currentGcd = gcd
+        totalOps += ops
+        if (currentGcd == 1L) break // Early exit if GCD drops to 1
+    }
+
+    return GCDResult(currentGcd, totalOps)
 }

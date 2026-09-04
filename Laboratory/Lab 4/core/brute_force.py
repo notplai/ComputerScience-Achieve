@@ -1,26 +1,53 @@
 from bitarray import bitarray
 
 
-def brute_force(l: str, k: int, /) -> tuple[int, int]:
-    ms, sol, g, p = 0, 0, [_ for _, c in enumerate(l) if c == 'G'], [_ for _, c in enumerate(l) if c == 'P']
-    P = bitarray(len(p)) # initialize bitarray size = p size
-    P.setall(0) # set every bits as 0
+def brute_force(l: str, k: int, /) -> tuple[list[list[tuple[int, int]]], int, int]:
+    g = [i for i, c in enumerate(l) if c == "G"]
+    p = [i for i, c in enumerate(l) if c == "P"]
+    num_g, num_p = len(g), len(p)
 
-    def _(gdx: int, cs: int, /) -> None:
-        nonlocal ms, sol
-        if gdx == len(g):
-            if cs > ms: ms = cs; sol = 1
-            elif cs == ms and ms > 0: sol+=1
+    if not g or not p: return [], 0, 0
+
+    gi = pi = ms = 0
+    while gi < num_g and pi < num_p:
+        if abs(g[gi] - p[pi]) <= k:
+            ms += 1
+            gi += 1
+            pi += 1
+        elif g[gi] < p[pi]: gi += 1
+        else: pi += 1
+
+    if ms == 0:
+        return [], 0, 0
+
+    candidates = [
+        [pdx for pdx, pos in enumerate(p) if abs(g_pos - pos) <= k]
+        for g_pos in g
+    ]
+    P = bitarray(num_p)
+    P.setall(0)
+
+    solarr: list[list[tuple[int, int]]] = []
+    path: list[tuple[int, int]] = []
+
+    def _(gdx: int, cs: int) -> None:
+        if cs + (num_g - gdx) < ms: return
+
+        if gdx == num_g:
+            if cs == ms: solarr.append(path.copy())
             return
 
-        for pdx in range(len(P)):
-            # if not P[pdx] and (g[gdx] - p[pdx] if g[gdx] >= p[pdx] else p[pdx] - g[gdx]) <= k:
-            if not P[pdx] and -k <= g[gdx] - p[pdx] <= k:
-                # extract absolute function to |g - p| <= k <=> -k <= g - p <= k
+        for pdx in candidates[gdx]:
+            if not P[pdx]:
                 P[pdx] = 1
+                path.append((g[gdx], p[pdx]))
                 _(gdx + 1, cs + 1)
+                path.pop()
                 P[pdx] = 0
 
-        _(gdx + 1, cs)
-    _(0,0)
-    return sol, ms
+        if cs + (num_g - 1 - gdx) >= ms:
+            _(gdx + 1, cs)
+
+    _(0, 0)
+    sol = len(solarr)
+    return solarr, sol, ms
